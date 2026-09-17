@@ -4,19 +4,36 @@ Single-most-important-question survey for the global Capoeira community.
 Branded "Capoeira International," run by Malta Capoeira.
 
 - **Live (v1):** https://maltascapoeira.github.io/smiq/
-- **Repo:** github.com/maltascapoeira/smiq
-- **Owner:** Paul (paulsmith@me.com)
+- **Live (v2):** https://smiq.capoeirainternational.workers.dev — note that
+  `main` can be ahead of what's deployed; check `npx wrangler deployments list
+  --name smiq` before assuming a merged commit is live, and run `npm run
+  deploy` (+ `npx wrangler secret bulk .env.local` if env vars changed) to
+  ship it
+- **Repo:** github.com/nyainmotion/capoeira-smiq
+- **Owner:** MALTAS
 
 ## Stack (v2 rebuild in progress)
 
 - **Next.js** (App Router) on **Cloudflare Workers** (via `@opennextjs/cloudflare`,
   moved from Vercel 2026-07-21 — see `PROJECT_NOTES.md`)
 - **Neon Postgres** (plain connection string; was via Vercel marketplace, now direct)
-- **Resend** for magic-link auth on the dashboard (likely)
+- **Resend** — double opt-in confirmation emails and owner notification emails
+  (`lib/email.ts`) are live. Magic-link auth for the dashboard is still just
+  the likely plan, not built — there is no dashboard yet (see Milestones below)
+- **Cloudflare Turnstile** for bot protection on the SMIQ form
+- **Kit (ConvertKit)** subscribes confirmed respondents, tagged by role/grad/lang
+- **next-intl** for EN/PT/ES/FR — locale content in `messages/*.json`
 - All Anthropic API calls server-side, key in env vars only
 
 V1 exposed the Anthropic key in browser code. That is the central reason for
 the rewrite. Don't recreate it.
+
+## Milestones
+
+- **M1** — Next.js scaffold, design tokens, Neon/Drizzle wired, landing page ✓
+- **M2** — SMIQ form, segment routing, confirm email, Turnstile, Kit, i18n ✓
+- **M3** — Dashboard (private, auth-gated), AI analysis server-side — **not
+  started**. No dashboard code exists in the repo yet.
 
 ## Reference docs
 
