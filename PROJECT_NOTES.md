@@ -58,6 +58,29 @@
   API is server-side)
 - Database branching for staging/preview deploys
 
+## Testing (decided 2026-09-19)
+
+- **Test runner: Vitest.** No test infra existed in the repo before this —
+  no vitest/jest, no config, no test files. Vitest was chosen because it
+  fits a Next.js/TS/ESM project cleanly with nothing to migrate off.
+  `npm test` runs it (`vitest run`); config is `vitest.config.ts` with a
+  manual `@/*` alias (one alias in `tsconfig.json`, so a full
+  tsconfig-parsing plugin wasn't worth the dependency).
+- **`"use server"` files can only export async functions.** Confirmed
+  against this repo's actual installed Next 16.2.6 — not assumed from
+  training data, per `AGENTS.md`'s warning that this Next version diverges
+  — via `node_modules/next/dist/server/typescript/rules/server-boundary.js`,
+  which is a live typecheck error here since `tsconfig.json` registers the
+  `next` TS plugin. Practical effect: any sync helper inside a `"use
+  server"` action file (e.g. `app/smiq/actions.ts`) can't be exported for
+  unit testing without breaking the build. **Pattern going forward:** pure
+  sync logic that needs test coverage lives in its own `lib/*.ts` module
+  (no directive) and gets imported into the action file — don't add
+  `export` to a sync function inside a `"use server"` file.
+- First applied to `validatePayload`, extracted to
+  `lib/validate-smiq-payload.ts` with a 35-case test suite (segments,
+  teacher-branch requirements, malformed email, normalization) — see PR #1.
+
 ## What to carry forward from v1
 
 The existing build is well-thought-through. v2 should preserve:
